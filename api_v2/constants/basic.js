@@ -54,7 +54,24 @@ export const basicGameData = {
       "cells_amount": 20
     }
   ],
-  "exchanger": [],
+  "exchanger": [
+    {
+      "id": "5144c07a-33ff-423d-872a-e593b1b35b8e",
+      "afford_type": "tobacco",
+      "afford_quantity": 5,
+      "receive_type": "boxes",
+      "receive_quantity": 1,
+      "waiting_time": 600
+    },
+    {
+      "id": "f378c03e-46b3-4765-859e-30d28daf177c",
+      "afford_type": "boxes",
+      "afford_quantity": 5,
+      "receive_type": "money",
+      "receive_quantity": 1,
+      "waiting_time": 600
+    }
+  ],
   "buildings": [
     {
       "type": "road",
