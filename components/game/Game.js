@@ -1,21 +1,18 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState, useTransition} from "react";
-import {setImportPromise} from "../../utils/scene/utils/helpers/import";
-import {ignoreNextStates} from "../../constants/empire";
-import {useDispatch} from "react-redux";
-import useStateReducer from "../../utils/scene/react/hooks/useStateReducer";
-import sceneRedux, {getNextState, load, requestState, useScene} from "../../redux/reducer/scene";
-import EmpireReduxBridge from "../../controllers/empire/bridge/EmpireReduxBridge";
-import TestBuildings from "../testBuildings/TestBuildings";
-import Exchanger from "../exchanger/Exchanger";
-import {useModal} from "../../hooks/useModal";
-import scene from "../../redux/reducer/scene";
-import {actionsTexts, research, storeContent, think} from "../../constants/copyright";
-import {getBuildingData, isEnough} from "../../utils/empire/data";
-import {requestBuild, requestInfo} from "./modals";
-import ProgressBar from "../progressBar/ProgressBar";
-import MapPin from "../mapPin/MapPin";
-import EventEffect from "../eventEffect/EventEffect";
-import {CSSTransition, SwitchTransition} from "react-transition-group";
+import React, {useEffect, useMemo, useRef, useState, useTransition} from 'react';
+import {setImportPromise} from '../../utils/scene/utils/helpers/import';
+import {ignoreNextStates} from '../../constants/empire';
+import {useDispatch} from 'react-redux';
+import useStateReducer from '../../utils/scene/react/hooks/useStateReducer';
+import sceneRedux, {getNextState, load, requestState, useScene} from '../../redux/reducer/scene';
+import EmpireReduxBridge from '../../controllers/empire/bridge/EmpireReduxBridge';
+import {useModal} from '../../hooks/useModal';
+import scene from '../../redux/reducer/scene';
+import {actionsTexts, research, think} from '../../constants/copyright';
+import {requestBuild, requestInfo} from './modals';
+import ProgressBar from '../progressBar/ProgressBar';
+import MapPin from '../mapPin/MapPin';
+import EventEffect from '../eventEffect/EventEffect';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 
 const Game = React.forwardRef(
@@ -42,21 +39,21 @@ const Game = React.forwardRef(
       requestModal({data: {type}}) {
         addModal({
           type,
-        })
+        });
       },
       openArea({onClick, areaName}) {
         const area = data.settings.areas.find(({name}) => name === areaName);
         addModal({
-          type: "extensionModal",
+          type: 'extensionModal',
           props: {
             buttons: [
               {
                 text: research,
-                action: "research"
+                action: 'research'
               },
               {
                 text: think,
-                className: "button_red"
+                className: 'button_red'
               }
             ],
             actions: {
@@ -74,7 +71,7 @@ const Game = React.forwardRef(
       onRemoveEffect({data: {type}}) {
         setEventData(null);
         addModal({
-          type: "actionModal",
+          type: 'actionModal',
           props: {
             text: actionsTexts[type]
           }
@@ -106,13 +103,13 @@ const Game = React.forwardRef(
     useEffect(() => {
       if (!isTutorialShown) {
         addModal({
-          type: "startModal",
+          type: 'startModal',
           props: {
             onClick() {
               addModal({
-                type: "tutorialModal",
+                type: 'tutorialModal',
                 props: {
-                  onClose(){
+                  onClose() {
                     dispatch(scene.actions.onShowTutorial());
                   }
                 }
@@ -143,20 +140,20 @@ const Game = React.forwardRef(
 
     useEffect(() => {
       const promise =
-        import("../../utils/scene/three/three")
-          .then(() => import("../../controllers/empire/EmpireWrapper"))
-          .then((data) => {
-            const {default: EmpireWrapper} = data;
+        import('../../utils/scene/three/three')
+        .then(() => import('../../controllers/empire/EmpireWrapper'))
+        .then((data) => {
+          const {default: EmpireWrapper} = data;
 
-            new EmpireReduxBridge({
-              dispatch,
-              builderResult: sceneRedux,
-              wrapper: EmpireWrapper.instance,
-            });
-
-            EmpireWrapper.instance.init();
-            return data;
+          new EmpireReduxBridge({
+            dispatch,
+            builderResult: sceneRedux,
+            wrapper: EmpireWrapper.instance,
           });
+
+          EmpireWrapper.instance.init();
+          return data;
+        });
 
       dispatch(load());
       setImportPromise(promise);
@@ -165,12 +162,12 @@ const Game = React.forwardRef(
         const scene = EmpireWrapper.instance;
         const {eventBus} = scene;
 
-        eventBus.addEventListener("complete-tutorial", callbacks.completeTutorial);
-        eventBus.addEventListener("request-modal", callbacks.requestModal);
-        eventBus.addEventListener("request-build", callbacks.requestBuild);
-        eventBus.addEventListener("request-info", callbacks.requestInfo);
-        eventBus.addEventListener("event:remove-effect", callbacks.onRemoveEffect);
-        eventBus.addEventListener("event:apply", callbacks.onApplyEvent);
+        eventBus.addEventListener('complete-tutorial', callbacks.completeTutorial);
+        eventBus.addEventListener('request-modal', callbacks.requestModal);
+        eventBus.addEventListener('request-build', callbacks.requestBuild);
+        eventBus.addEventListener('request-info', callbacks.requestInfo);
+        eventBus.addEventListener('event:remove-effect', callbacks.onRemoveEffect);
+        eventBus.addEventListener('event:apply', callbacks.onApplyEvent);
 
         setScene(scene);
         scene.appendContainer(wrapperRef.current);
@@ -186,49 +183,49 @@ const Game = React.forwardRef(
     );
 
     return (
-      <div className={"game"} ref={ref}>
-        <div className={"game__wrapper"} ref={wrapperRef}/>
+      <div className={'game'} ref={ref}>
+        <div className={'game__wrapper'} ref={wrapperRef}/>
         {constructionList
-          .map((
-              {stateProgress, buildProgressPin: {uuid, setView, viewData: {x, y, isVisible}}}, index
-            ) =>
-              <ProgressBar
-                setView={setView}
-                key={`progress_${uuid}`}
-                progress={stateProgress * 100}/>
-          )}
+        .map((
+            {stateProgress, buildProgressPin: {uuid, setView, viewData: {x, y, isVisible}}}, index
+          ) =>
+            <ProgressBar
+              setView={setView}
+              key={`progress_${uuid}`}
+              progress={stateProgress * 100}/>
+        )}
         {buildingList
-          .map((
-              {
-                iconName, iconPin: {
-                uuid,
-                setView
-              }
-              }, index
-            ) =>
-              <MapPin
-                key={uuid}
-                type={iconName}
-                setView={setView}
-              />
-          )}
+        .map((
+            {
+              iconName, iconPin: {
+              uuid,
+              setView
+            }
+            }, index
+          ) =>
+            <MapPin
+              key={uuid}
+              type={iconName}
+              setView={setView}
+            />
+        )}
         {closedAreas
-          .map((
-              {
-                pin: {
-                  data: {areaName},
-                  setView, uuid, onClick
-                }
-              }, index
-            ) =>
-              <MapPin
-                key={uuid}
-                type={"empty"}
-                interactive={true}
-                onClick={() => callbacks.openArea({onClick, areaName})}
-                setView={setView}
-              />
-          )}
+        .map((
+            {
+              pin: {
+                data: {areaName},
+                setView, uuid, onClick
+              }
+            }, index
+          ) =>
+            <MapPin
+              key={uuid}
+              type={'empty'}
+              interactive={true}
+              onClick={() => callbacks.openArea({onClick, areaName})}
+              setView={setView}
+            />
+        )}
         <SwitchTransition>
           <CSSTransition key={eventData ? 'show' : 'hide'} timeout={500}>
             {eventEffect}
