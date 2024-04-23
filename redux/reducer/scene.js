@@ -1,6 +1,6 @@
 import Builder from '../../utils/redux/builder';
 import {states} from '../../constants/empire';
-import {brokeBuildings, collect, destroy, exchange, getSettings, open, produce, repair, tasks} from '../../api/empire';
+import {collect, destroy, exchange, produce, repair, tasks} from '../../api/empire';
 import {importControllerJS} from '../../utils/scene/utils/helpers/import';
 import {getBuildingSettings} from '../../utils/empire/data';
 import tutorialController from '../../controllers/empire/tutorial/TutorialController';
@@ -67,8 +67,7 @@ builder
 })
 .createExtraReducer({
   thunkName: 'load',
-  saveData(state, {payload}) {
-    const {areas, buildings, exchanger, account} = payload;
+  saveData(state, {payload: {areas, buildings, exchanger, account}}) {
 
     updateState(account, state);
 
@@ -99,56 +98,86 @@ builder
 })
 .createExtraReducer({
   thunkName: 'build',
-  saveData(state, {payload: account}) {
-    updateState(account, state);
-    instance.updateWorldState(state.worldState, true);
-  },
   func: async function ({area, cell, type}) {
     const account = gameDataController.build({area, cell, building_type: type});
     global.window?.soundManager?.onPlay('building',);
-    return account;
+    return {account};
   }
 })
 .createExtraReducer({
   thunkName: 'upgrade',
-  saveData(state, {payload: account}) {
-    updateState(account, state);
-    instance.updateWorldState(state.worldState, true);
-  },
   func: async function (data) {
     const account = gameDataController.upgrade(data);
     global.window?.soundManager?.onPlay('upgrade',);
-    return account;
+    return {account};
   }
 })
 .createExtraReducer({
   thunkName: 'completeTutorial',
-  saveData(state, {payload: account}) {
-    if (account) {
-      updateState(account, state);
-      instance.updateWorldState(state.worldState, true);
-    }
+  saveData(state) {
+    state.worldState.passed_tutorial = true;
   },
   func: async function (params, state) {
     if (state.worldState.passed_tutorial) return;
-    return gameDataController.completeTutorial();
+    gameDataController.completeTutorial();
   }
 })
 .createExtraReducer({
   thunkName: 'open',
-  saveData(state, {payload: account}) {
-    updateState(account, state);
-    instance.updateWorldState(state.worldState, true);
-  },
   func: async function ({area}) {
-    return gameDataController.open(area);
+    const account = gameDataController.open(area);
+    return {account};
+  }
+})
+.createExtraReducer({
+  thunkName: 'broke',
+  func: async function ({cells, type}) {
+    cells.forEach(data => data.reason = type);
+    const account = gameDataController.broke(cells);
+    return {account};
+  }
+})
+.createExtraReducer({
+  thunkName: 'update',
+  func: async function () {
+    return gameDataController.getGameData();
+  }
+})
+.createExtraReducer({
+  thunkName: 'produce',
+  func: async function ({cellId: cell, area}) {
+    const account = gameDataController.produce({area, cell});
+    return {account};
+  }
+})
+.createExtraReducer({
+  thunkName: 'repair',
+  func: async function ({area, cell}) {
+    const account = gameDataController.repair({area, cell});
+    global.window?.soundManager?.onPlay('repair',);
+    return {account};
+  }
+})
+.createExtraReducer({
+  thunkName: 'collect',
+  func: async function ({cell, area}) {
+    const account = gameDataController.collect({area, cell});
+    return { account }
+  }
+})
+.createExtraReducer({
+  thunkName: 'destroy',
+  func: async function ({area, cell}) {
+    const account = gameDataController.destroy({area, cell})
+    global.window?.soundManager?.onPlay('destroy',);
+    return {account}
   }
 })
 .createExtraReducer({
   thunkName: 'exchange',
   func: async function ({id, quantity}) {
-    const {data} = await exchange({id, receive_quantity: quantity});
-    return {account: data};
+    const account = gameDataController.exchange({id, quantity})
+    return { account }
   }
 })
 .createExtraReducer({
@@ -158,55 +187,6 @@ builder
   },
   func: async function () {
     const {data} = await tasks();
-    return data;
-  }
-})
-.createExtraReducer({
-  thunkName: 'collect',
-  func: async function ({cell, area}) {
-    const {data} = await collect({area, cell});
-    return data;
-  }
-})
-.createExtraReducer({
-  thunkName: 'destroy',
-  func: async function (data) {
-    const {data: result} = await destroy(data);
-    global.window?.soundManager?.onPlay('destroy',);
-    return result;
-  }
-})
-.createExtraReducer({
-  thunkName: 'update',
-  func: async function () {
-    const {data} = await getSettings();
-    return data;
-  }
-})
-.createExtraReducer({
-  thunkName: 'broke',
-  func: async function ({cells, type}) {
-
-    cells.forEach(data => data.reason = type);
-
-    const {data} = await brokeBuildings(cells);
-
-    return {account: data};
-  }
-})
-.createExtraReducer({
-  thunkName: 'repair',
-  func: async function (params) {
-    const {data} = await repair(params);
-    global.window?.soundManager?.onPlay('repair',);
-    return data;
-  }
-})
-.createExtraReducer({
-  thunkName: 'produce',
-  func: async function ({cellId, area}) {
-    const {data} = await produce({area, cell: cellId});
-
     return data;
   }
 })

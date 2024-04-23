@@ -71,7 +71,7 @@ const EventEffect = React.forwardRef(
             <div className="event-effect__frame">
               <img src={`images/effects/${type}-frame.png`} alt="event-frame"/>
             </div>
-            <div className="event-effect__content">
+            <div key={ type } className="event-effect__content">
               {type === "snowstorm" && snowItems}
               {type === "flood" && floodItems}
               {type === "tornado" && tornadoItems}
