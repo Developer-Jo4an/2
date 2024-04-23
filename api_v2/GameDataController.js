@@ -25,12 +25,12 @@ class GameDataController extends GameDataBasicController {
     return this.gameData.account.world_state;
   }
 
-  updateAccountTime(date) {
-    this.gameData.account.update_at = moment(date * 1000).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  updateAccountTime() {
+    this.gameData.account.update_at = moment(nowInSec() * 1000).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
 
   updateDisasterTime() {
-    this.gameData.account.last_time_disaster = Math.floor(Date.now() / 1000);
+    this.gameData.account.last_time_disaster = nowInSec();
   }
 
   getUpgradeDates(addedTime) {
@@ -91,7 +91,7 @@ class GameDataController extends GameDataBasicController {
 
     const {start, end} = this.getUpgradeDates(improvement.construction_time);
 
-    this.updateAccountTime(start);
+    this.updateAccountTime();
 
     const currentWorldState = this.getWorldState();
 
@@ -151,7 +151,7 @@ class GameDataController extends GameDataBasicController {
       }
     };
 
-    this.updateAccountTime(start);
+    this.updateAccountTime();
 
     this.updateArea(area, newAreaState);
 
@@ -161,7 +161,7 @@ class GameDataController extends GameDataBasicController {
   }
 
   completeTutorial() {
-    this.updateAccountTime(nowInSec());
+    this.updateAccountTime();
 
     this.gameData.account.passed_tutorial = true;
 
@@ -177,7 +177,7 @@ class GameDataController extends GameDataBasicController {
 
     const currentWorldState = this.getWorldState();
 
-    const updatedTime = nowInSec();
+    const upgradingTime = nowInSec();
 
     const openCostArea = this.gameData.areas.find(({name}) => name === area).open_cost;
 
@@ -193,13 +193,13 @@ class GameDataController extends GameDataBasicController {
           produce_start: null,
           is_broken: false,
           last_time_collected: null,
-          start_upgrading: updatedTime,
-          last_time_upgraded: updatedTime
+          start_upgrading: upgradingTime,
+          last_time_upgraded: upgradingTime
         }
       }
     };
 
-    this.updateAccountTime(updatedTime);
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -217,7 +217,7 @@ class GameDataController extends GameDataBasicController {
 
     this.updateDisasterTime();
 
-    this.updateAccountTime(nowInSec());
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -227,11 +227,9 @@ class GameDataController extends GameDataBasicController {
   produce({area, cell}) {
     if (!this.isHaveArea(area) || !this.isHaveCell(area, cell)) return;
 
-    const updatedTime = nowInSec();
+    this.updateCell(area, cell, 'produce_start', nowInSec());
 
-    this.updateCell(area, cell, 'produce_start', updatedTime);
-
-    this.updateAccountTime(updatedTime);
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -249,7 +247,7 @@ class GameDataController extends GameDataBasicController {
 
     this.updateCell(area, cell, 'is_broken', false);
 
-    this.updateAccountTime(nowInSec());
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -287,11 +285,9 @@ class GameDataController extends GameDataBasicController {
 
     this.addResource(production_type, fromRoadAmpl * fromOfficeAmpl * bonus * production_quantity);
 
-    const updatedTime = nowInSec();
+    this.updateCell(area, cell, 'last_time_collected', nowInSec());
 
-    this.updateCell(area, cell, 'last_time_collected', updatedTime);
-
-    this.updateAccountTime(updatedTime);
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -315,7 +311,7 @@ class GameDataController extends GameDataBasicController {
 
     this.updateArea(area, newAreaState);
 
-    this.updateAccountTime(nowInSec());
+    this.updateAccountTime();
 
     this.updateGameData();
 
@@ -330,7 +326,7 @@ class GameDataController extends GameDataBasicController {
     this.gameData.account[`${afford_type}_amount`] -= quantity * afford_quantity
     this.gameData.account[`last_exchange_on_${receive_type}`] = nowInSec()
 
-    this.updateAccountTime(nowInSec());
+    this.updateAccountTime();
 
     this.updateGameData();
 
