@@ -49,10 +49,14 @@ export default class HelpController {
   }
 
   createArea({area, cells}) {
-    return {
-      ...this.getWorldState()[area],
-      ...cells
-    }
+    const totalArea = { ...this.getWorldState()[area] }
+
+    cells.forEach(cell => {
+      const [cellName, cellValue] = Object.entries(cell)[0]
+      totalArea[cellName] = cellValue
+    })
+
+    return totalArea
   }
 
   updateArea(area, newArea) {
@@ -82,7 +86,7 @@ export default class HelpController {
   updateCell(area, cell, field, fieldValue) {
     const currentWorldState = this.getWorldState();
 
-    this.gameData.account.world_state = {
+    this.gameData.account.world_state = { //todo: подумать над рефактором
       ...currentWorldState,
       [area]: {
         ...currentWorldState[area],

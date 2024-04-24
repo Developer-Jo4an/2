@@ -44,7 +44,9 @@ export default class Pin extends THREE.Object3D {
   updateViewStyle() {
     if (!this.viewData || !this.view) return;
     const {viewData: {x, y, isVisible}, view, visible} = this;
-
+    console.log(x);
+    console.log(y);
+    console.log('-------------');
     view.style.opacity = isVisible ? "1" : "0";
     view.style.pointerEvents = isVisible ? "" : "none";
     view.style.display = visible ? "" : "none";

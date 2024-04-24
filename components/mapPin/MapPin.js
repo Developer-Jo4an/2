@@ -7,7 +7,6 @@ const MapPin = React.forwardRef(
     //type = "field" / "factory" / "store" / "repair" / "empty" / "road" / "office" / "forest"
 
     const ref = useRef(null);
-
     useEffect(() => {
       setView?.(ref.current);
 

@@ -38,16 +38,16 @@ export default class EventsController {
 
     const {canApply} = event.apply();
 
-    if (!canApply) {
-      if (isRetry && !this.cEventsCollection.length) return;
-
-      if (!isRetry)
-        this.cEventsCollection = [...this.eventsCollection].filter(e => event !== e);
-
-      return this.runEvent(true);
+    if (canApply) {
+      this.prevRun = getTimestamp();
+      return;
     }
 
+    if (isRetry && !this.cEventsCollection.length) return;
 
-    this.prevRun = getTimestamp();
+    if (!isRetry)
+      this.cEventsCollection = [...this.eventsCollection].filter(e => event !== e);
+
+    return this.runEvent(true);
   }
 }

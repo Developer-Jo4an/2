@@ -1,4 +1,4 @@
-import {UNDELETED_BUILDINGS} from '../constants/variables';
+import {DESTROY_RESOURCE, MAIN_RESOURCE, UNDELETED_BUILDINGS} from '../constants/variables';
 import HelpController from './HelpController';
 
 let instance = null;
@@ -17,9 +17,13 @@ export default class DestroyCommand {
 
     const currentWorldState = this.help.getWorldState();
 
-    const {type} = currentWorldState[area][cell];
+    const {type, improvement} = currentWorldState[area][cell];
 
-    if (UNDELETED_BUILDINGS.includes(type)) return;
+    if (
+      UNDELETED_BUILDINGS.includes(type)
+      ||
+      this.gameData.account[`${MAIN_RESOURCE}_amount`] < improvement[DESTROY_RESOURCE]
+    ) return;
 
     const newAreaState = {};
     for (const cellId in currentWorldState[area])
@@ -31,7 +35,5 @@ export default class DestroyCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

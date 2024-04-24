@@ -1,5 +1,6 @@
-import {IS_BROKEN_FIELD, MAIN_RESOURCE} from '../constants/variables';
+import { IS_BROKEN_FIELD, MAIN_RESOURCE, PRODUCE_START_FIELD } from '../constants/variables'
 import HelpController from './HelpController';
+import { nowInSec } from '../helpers/helpers'
 
 let instance = null;
 
@@ -17,16 +18,17 @@ export default class RepairCommand {
 
     const currentWorldState = this.help.getWorldState();
 
-    const {repair_cost} = currentWorldState[area][cell].improvement;
+    const repairCost = currentWorldState[area][cell].improvement.repair_cost;
 
-    this.help.subtractResource(MAIN_RESOURCE, repair_cost);
+    if (this.gameData.account[`${MAIN_RESOURCE}_amount`] < repairCost) return;
+
+    this.help.subtractResource(MAIN_RESOURCE, repairCost);
 
     this.help.updateCell(area, cell, IS_BROKEN_FIELD, false);
+    this.help.updateCell(area, cell, PRODUCE_START_FIELD, nowInSec())
 
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

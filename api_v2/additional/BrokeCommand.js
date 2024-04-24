@@ -1,4 +1,4 @@
-import {IS_BROKEN_FIELD} from '../constants/variables';
+import { IS_BROKEN_FIELD, PRODUCE_START_FIELD } from '../constants/variables'
 import HelpController from './HelpController';
 
 let instance = null;
@@ -17,6 +17,7 @@ export default class BrokeCommand {
       if (!this.help.isHaveCell(area, cell)) return;
 
       this.help.updateCell(area, cell, IS_BROKEN_FIELD, true);
+      this.help.updateCell(area, cell, PRODUCE_START_FIELD, null)
     });
 
     this.help.updateDisasterTime();
@@ -24,7 +25,5 @@ export default class BrokeCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

@@ -34,6 +34,7 @@ const EventEffect = React.forwardRef(
       }
       return list;
     }, []);
+
     const tornadoItems = useMemo(() => {
       let list = [];
       for (let i = 0; i < 6; i++) {
@@ -52,9 +53,7 @@ const EventEffect = React.forwardRef(
 
 
     useEffect(() => {
-      console.log("effect_start");
       const timeout = setTimeout(() => {
-        console.log("effect_end");
         onComplete?.();
       }, viewEffectDuration);
 
@@ -71,14 +70,13 @@ const EventEffect = React.forwardRef(
             <div className="event-effect__frame">
               <img src={`images/effects/${type}-frame.png`} alt="event-frame"/>
             </div>
-            <div key={ type } className="event-effect__content">
+            <div className="event-effect__content">
               {type === "snowstorm" && snowItems}
               {type === "flood" && floodItems}
               {type === "tornado" && tornadoItems}
             </div>
           </>
         }
-
       </div>
     );
   });

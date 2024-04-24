@@ -1,4 +1,4 @@
-import {DEFAULT_BUILDING, DEFAULT_CELL, MAIN_RESOURCE} from '../constants/variables';
+import {DEFAULT_BUILDING, DEFAULT_CELL, MAIN_RESOURCE, OPEN_RESOURCE} from '../constants/variables';
 import HelpController from './HelpController';
 
 let instance = null;
@@ -13,14 +13,16 @@ export default class OpenCommand {
     this.help = new HelpController();
   }
 
-  execute(area) {
+  execute({ area }) {
     if (this.help.isHaveArea(area)) return;
 
     const improvement = this.help.getStartImprovement(DEFAULT_BUILDING)
 
-    const openCostArea = this.gameData.areas.find(({name}) => name === area).open_cost;
+    const openCost = this.gameData.areas.find(({name}) => name === area).open_cost;
 
-    this.help.subtractResource(MAIN_RESOURCE, openCostArea);
+    if (this.gameData.account[`${MAIN_RESOURCE}_amount`] < openCost) return;
+
+    this.help.subtractResource(MAIN_RESOURCE, openCost);
 
     const { start, end } = this.help.getTimeInterval(0)
     const newCell = this.help.createCell({ cell: DEFAULT_CELL, improvement, type: DEFAULT_BUILDING, start, end })
@@ -30,7 +32,5 @@ export default class OpenCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

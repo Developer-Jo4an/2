@@ -18,6 +18,8 @@ export default class BuildCommand {
 
     const improvement = this.help.getStartImprovement(type);
 
+    if (this.gameData.account[`${MAIN_RESOURCE}_amount`] < improvement.cost) return;
+
     this.help.subtractResource(MAIN_RESOURCE, improvement.cost);
 
     const {start, end} = this.help.getTimeInterval(improvement.construction_time);
@@ -28,7 +30,5 @@ export default class BuildCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

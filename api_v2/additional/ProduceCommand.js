@@ -13,7 +13,7 @@ export default class ProduceCommand {
     this.help = new HelpController();
   }
 
-  execute({area, cell}) {
+  execute({ area, cellId: cell }) {
     if (!this.help.isHaveCell(area, cell)) return;
 
     this.help.updateCell(area, cell, PRODUCE_START_FIELD, nowInSec());
@@ -21,7 +21,5 @@ export default class ProduceCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

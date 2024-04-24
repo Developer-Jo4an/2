@@ -1,6 +1,5 @@
 import Area from "./Area";
 import Cell from "./Cell";
-import PerformanceStats from "../../../utils/scene/three/performance/Stats";
 
 export default class CellsController {
 
@@ -150,7 +149,6 @@ export default class CellsController {
     const {storage, eventBus} = this;
 
     const area = Object.values(this.areas).find(({object3D}) => object3D.getObjectById(child.id))
-
     const cell = new Cell({
       object3D: child,
       storage,

@@ -9,7 +9,8 @@ const ChecklistModal = React.forwardRef(
     const {tasks} = useScene();
 
     useEffect(() => {
-      dispatch(scene.thunks.tasks());
+      if (scene.thunks.tasks)
+        dispatch(scene.thunks.tasks());
     }, []);
 
     return (

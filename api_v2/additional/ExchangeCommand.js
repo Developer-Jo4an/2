@@ -16,6 +16,8 @@ export default class ExchangeCommand {
     const {afford_type, receive_type, afford_quantity} = this.gameData.exchanger
     .find(({id: exchangerId}) => exchangerId === id);
 
+    //todo: Возможно сделать до проверку на то, хватает ли ресурсов
+
     this.help.addResource(receive_type, quantity)
     this.help.subtractResource(afford_type, quantity * afford_quantity)
     this.gameData.account[`last_exchange_on_${receive_type}`] = nowInSec();
@@ -23,7 +25,5 @@ export default class ExchangeCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

@@ -32,6 +32,8 @@ const Game = React.forwardRef(
 
     const [wrapper, setScene] = useState();
 
+    const [eventType, setEventType] = useState(null);
+
     const callbacks = useMemo(() => ({
       completeTutorial() {
         dispatch(scene.thunks.completeTutorial());
@@ -70,6 +72,7 @@ const Game = React.forwardRef(
       },
       onRemoveEffect({data: {type}}) {
         setEventData(null);
+        setEventType(null);
         addModal({
           type: 'actionModal',
           props: {
@@ -90,15 +93,18 @@ const Game = React.forwardRef(
 
     const {state} = useScene();
 
-    const eventEffect = useMemo(() => eventData ?
-      <EventEffect {...eventData}/>
-      : <></>, [eventData]);
-    // const eventEffect = useMemo(() => <EventEffect type={"tornado"}/>, [eventData]);
+    const eventEffect = useMemo(() => {
+      if (!eventData) return <></>;
+
+      if (eventType) return <EventEffect {...{type: eventType, onComplete: eventData.onComplete}}/>;
+
+      setEventType(eventData.type);
+      return <EventEffect {...eventData}/>;
+    }, [eventData]);
 
     data.wrapper = wrapper;
     data.settings = settings;
     data.worldState = worldState;
-
 
     useEffect(() => {
       if (!isTutorialShown) {
@@ -125,16 +131,13 @@ const Game = React.forwardRef(
 
       function update() {
         const {buildings, constructionBuildings, closedAreas} = wrapper;
-
         startTransition(() => {
           setConstructionList([...constructionBuildings]);
           setBuildingList([...buildings]);
           setClosedAreas([...closedAreas]);
         });
-
         requestAnimationFrame(update);
       }
-
       requestAnimationFrame(update);
     }, [wrapper]);
 

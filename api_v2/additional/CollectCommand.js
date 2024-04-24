@@ -1,37 +1,25 @@
-import {AMPL_BUILDING, DEFAULT_CELL, LAST_TIME_COLLECTED_FIELD} from '../constants/variables';
+import {AMPL_BUILDING, DEFAULT_CELL, FIELD_BUILDING, LAST_TIME_COLLECTED_FIELD} from '../constants/variables';
 import {nowInSec} from '../helpers/helpers';
 import HelpController from './HelpController';
 
-let instance = null
+let instance = null;
 
 export default class CollectCommand {
 
   constructor(gameData) {
-    if (instance) return instance
-    instance = this
+    if (instance) return instance;
+    instance = this;
 
     this.gameData = gameData;
     this.help = new HelpController();
   }
 
-  execute({area, cell}) {
-    if (!this.help.isHaveCell(area, cell)) return;
+  getBonus({area, cell, improvement: {bonus_chance, bonus_multiplier, production_quantity}}) {
+    const multiplier = Math.random() < bonus_chance ? bonus_multiplier : 1;
 
-    const currentWorldState = this.help.getWorldState();
+    const fromRoadAmpl = this.help.getWorldState()[area][DEFAULT_CELL].improvement.amplification_value;
 
-    const {
-      improvement: {
-        production_type,
-        production_quantity,
-        bonus_chance,
-        bonus_multiplier
-      }
-    } = currentWorldState[area][cell];
-
-    const bonus = Math.random() < bonus_chance ? bonus_multiplier : 1;
-    const fromRoadAmpl = currentWorldState[area][DEFAULT_CELL].improvement.amplification_value;
-    const nearCells = this.help.getNearCells(area, cell)
-    const fromOfficeAmpl = Object.values(nearCells)
+    const fromOfficeAmpl = Object.values(this.help.getNearCells(area, cell))
     .reduce((multiple, building) =>
         building?.type === AMPL_BUILDING ?
           multiple * building.improvement.amplification_value
@@ -39,16 +27,52 @@ export default class CollectCommand {
           multiple
       , 1);
 
-    const totalQuantity = fromRoadAmpl * fromOfficeAmpl * bonus * production_quantity
+    return fromRoadAmpl * fromOfficeAmpl * multiplier * production_quantity;
+  }
 
-    this.help.addResource(production_type, totalQuantity);
+  fieldCollect({area, cell}) {
+    const {improvement} = this.help.getWorldState()[area][cell];
+
+    const totalEarn = this.getBonus({area, cell, improvement});
+
+    this.help.addResource(improvement.production_type, totalEarn);
+
+    return true;
+  }
+
+  collect({area, cell}) {
+    const {improvement} = this.help.getWorldState()[area][cell];
+
+    const totalEarn = this.getBonus({area, cell, improvement});
+
+    const {production_cost_type, production_cost, production_type} = improvement;
+
+    const isCollected = this.gameData.account[`${production_cost_type}_amount`] >= production_cost;
+
+    if (!isCollected) return false;
+
+    this.help.subtractResource(production_cost_type, production_cost);
+    this.help.addResource(production_type, totalEarn);
+
+    return true;
+  }
+
+  execute({area, cell}) {
+    if (!this.help.isHaveCell(area, cell)) return;
+
+    const {type} = this.help.getWorldState()[area][cell];
+
+    const isCollected = type === FIELD_BUILDING ?
+      this.fieldCollect({area, cell})
+      :
+      this.collect({area, cell});
+
+    if (!isCollected) return;
 
     this.help.updateCell(area, cell, LAST_TIME_COLLECTED_FIELD, nowInSec());
 
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

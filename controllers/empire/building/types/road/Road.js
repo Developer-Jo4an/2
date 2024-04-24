@@ -1,9 +1,9 @@
-import BaseBuilding from "../../BaseBuilding";
-import {recursiveDisableAutoUpdateMatrix} from "../../../../../utils/scene/three/three-utils";
+import BaseBuilding from '../../BaseBuilding';
+import {recursiveDisableAutoUpdateMatrix} from '../../../../../utils/scene/three/three-utils';
 
 export class Road extends BaseBuilding {
 
-  type = "road";
+  type = 'road';
 
   constructor(data) {
     super(data);
@@ -16,11 +16,11 @@ export class Road extends BaseBuilding {
     const {improvementLevel} = this;
 
     this.view = this.cell.object3D.children.filter((child, index) => {
-      if (!child.name.includes("lvl")) return;
+      if (!child.name.includes('lvl')) return;
       return child.visible = index === improvementLevel;
     })[0];
 
-    const container = this.view.parent.children.find(({name}) => name.includes("_pin"));
+    const container = this.view.parent.children.find(({name}) => name.includes('_pin'));
 
     if (container) {
       container.add(this.cell.bbox);
@@ -38,7 +38,6 @@ export class Road extends BaseBuilding {
   createView() {
     this.view = new THREE.Object3D;
     this.addPins();
-
   }
 
   init({child}) {

@@ -13,7 +13,7 @@ export default class UpgradeCommand {
   }
 
   execute({area, cell}) {
-    if (!this.help.isHaveCell(area)) return;
+    if (!this.help.isHaveCell(area, cell)) return;
 
     const nextImprovement = this.help.getWorldState()[area][cell].improvement.next_improvement;
 
@@ -25,6 +25,8 @@ export default class UpgradeCommand {
         acc;
     }, {});
 
+    if (this.gameData.account[`${MAIN_RESOURCE}_amount`] < improvement.cost) return;
+
     this.help.subtractResource(MAIN_RESOURCE, improvement.cost);
 
     const {start, end} = this.help.getTimeInterval(improvement.construction_time);
@@ -35,7 +37,5 @@ export default class UpgradeCommand {
     this.help.updateAccountTime();
 
     this.help.updateGameDataInStorage();
-
-    return this.gameData.account;
   }
 }

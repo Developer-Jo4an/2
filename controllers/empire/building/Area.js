@@ -19,7 +19,6 @@ export default class Area extends THREE.Object3D {
     this.eventBus = eventBus;
     this.object3D = object3D;
 
-
     object3D.area = this;
 
     recursiveDisableAutoUpdateMatrix(object3D);
@@ -29,8 +28,6 @@ export default class Area extends THREE.Object3D {
     this.initInteractive();
 
     this.hide(true);
-
-
   }
 
   get originalName() {
